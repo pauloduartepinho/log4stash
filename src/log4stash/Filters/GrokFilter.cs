@@ -19,6 +19,8 @@ namespace log4stash.Filters
         [PropertyNotEmpty]
         public string SourceKey { get; set; }
 
+        public bool NamedCapturesOnly { get; set; } = false;
+        
         public bool Overwrite { get; set; }
 
         [PropertyNotEmpty]
@@ -28,7 +30,8 @@ namespace log4stash.Filters
             set
             {
                 var format = new GrokSmartFormatter(value).Format(GrokPatternsKeyValue);
-                _regex = new Regex(format, RegexOptions.Compiled);
+                var regexOptions = NamedCapturesOnly ? RegexOptions.Compiled | RegexOptions.ExplicitCapture : RegexOptions.Compiled;
+                _regex = new Regex(format, regexOptions);
                 _groupNames = _regex.GetGroupNames().Except(_exceptGroups).ToArray();
             }
         }
